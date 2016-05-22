@@ -1,5 +1,9 @@
 package com.birthdaywishes.util;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -10,18 +14,21 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import com.birthdaywishes.constants.Constants;
 
 /**
- * @author Akash
- * This class many utility methods.
+ * @author Akash This class many utility methods.
  *
  */
 public class Utility implements UtilityInterface {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.vishalstationers.util.UtilityInterface#getSessionProperties()
 	 */
 	public Properties getSessionProperties() {
@@ -33,8 +40,12 @@ public class Utility implements UtilityInterface {
 		return properties;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.vishalstationers.util.UtilityInterface#createMimeMessage(javax.mail.Session, java.util.List, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.vishalstationers.util.UtilityInterface#createMimeMessage(javax.mail.
+	 * Session, java.util.List, java.lang.String, java.lang.String)
 	 */
 	public Message createMimeMessage(Session session, List<String> listOfToEmailId, String subject, String text) {
 		Address[] arrayOfToAddress = new Address[listOfToEmailId.size()];
@@ -49,7 +60,26 @@ public class Utility implements UtilityInterface {
 			message.setFrom(new InternetAddress(Constants.FROM_EMAIL_ID));
 			message.setRecipients(RecipientType.TO, arrayOfToAddress);
 			message.setSubject(subject);
-			message.setText(text);
+
+			// Create Multi Part object.
+			MimeMultipart multiPart = new MimeMultipart();
+			
+			// Body part 1.
+			MimeBodyPart bodyPart = new MimeBodyPart();
+			String htmlText=readHtmlFile("resources/Birthday.html");
+			bodyPart.setText(htmlText, "US-ASCII", "html");
+			// Add Body part 1 to Multi Part.
+			multiPart.addBodyPart(bodyPart);
+
+			// Body part 2.
+			MimeBodyPart imageBodyPart = new MimeBodyPart();
+			imageBodyPart.attachFile("resources/Birthday.jpg");
+			imageBodyPart.setContentID("<" + "image" + ">");
+			imageBodyPart.setDisposition(MimeBodyPart.INLINE);
+
+			// Add Body part 2 to Multi Part.
+			multiPart.addBodyPart(imageBodyPart);
+			message.setContent(multiPart);
 		} catch (AddressException addressException) {
 			addressException.printStackTrace();
 			System.out.println(addressException.getMessage());
@@ -61,6 +91,41 @@ public class Utility implements UtilityInterface {
 			System.out.println(exception.getMessage());
 		}
 		return message;
+	}
+
+	/**
+	 * @param fileName
+	 * @return
+	 * This method reads HTML file and return string.
+	 */
+	private String readHtmlFile(String fileName) {
+		StringBuffer stringBuffer = new StringBuffer();
+		FileReader fileReader = null;
+		BufferedReader bufferReader = null;
+
+		try {
+			fileReader = new FileReader(fileName);
+			String line = null;
+			bufferReader = new BufferedReader(fileReader);
+
+			while ((line = bufferReader.readLine()) != null) {
+				stringBuffer.append(line);
+				stringBuffer.append(System.getProperty("line.separator"));
+			}
+		} catch (FileNotFoundException ex) {
+			System.out.println("File not found");
+		} catch (IOException ex) {
+			System.out.println("Couldn't read lines from file.");
+
+		} finally {
+			try {
+				fileReader.close();
+				bufferReader.close();
+			} catch (IOException e) {
+				System.out.println("Couldn't read lines from file.");
+			}
+		}
+		return stringBuffer.toString();
 	}
 
 }

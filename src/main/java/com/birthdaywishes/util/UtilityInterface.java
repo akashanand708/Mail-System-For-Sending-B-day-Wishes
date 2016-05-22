@@ -7,8 +7,7 @@ import javax.mail.Message;
 import javax.mail.Session;
 
 /**
- * @author Akash
- * This interface has different utility related methods.
+ * @author Akash This interface has different utility related methods.
  *
  */
 public interface UtilityInterface {
@@ -26,4 +25,5 @@ public interface UtilityInterface {
 	 * @return This method returns Message object after preparing it.
 	 */
 	public Message createMimeMessage(Session session, List<String> listOfToEmailId, String subject, String text);
+
 }
