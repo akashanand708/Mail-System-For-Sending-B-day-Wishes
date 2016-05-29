@@ -18,6 +18,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.log4j.Logger;
+
 import com.birthdaywishes.constants.Constants;
 
 /**
@@ -26,6 +28,7 @@ import com.birthdaywishes.constants.Constants;
  */
 public class Utility implements UtilityInterface {
 
+	private final Logger log=Logger.getLogger(Utility.class);
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -81,14 +84,11 @@ public class Utility implements UtilityInterface {
 			multiPart.addBodyPart(imageBodyPart);
 			message.setContent(multiPart);
 		} catch (AddressException addressException) {
-			addressException.printStackTrace();
-			System.out.println(addressException.getMessage());
+			log.error(addressException);			
 		} catch (MessagingException messagingException) {
-			messagingException.printStackTrace();
-			System.out.println(messagingException.getMessage());
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			System.out.println(exception.getMessage());
+			log.error(messagingException);
+		} catch (IOException e) {
+			log.error(e);
 		}
 		return message;
 	}
@@ -111,18 +111,16 @@ public class Utility implements UtilityInterface {
 			while ((line = bufferReader.readLine()) != null) {
 				stringBuffer.append(line);
 				stringBuffer.append(System.getProperty("line.separator"));
-			}
+			}			
 		} catch (FileNotFoundException ex) {
-			System.out.println("File not found");
+			log.error(ex);
 		} catch (IOException ex) {
-			System.out.println("Couldn't read lines from file.");
-
-		} finally {
+			log.error(ex);
+		}finally{
 			try {
-				fileReader.close();
 				bufferReader.close();
 			} catch (IOException e) {
-				System.out.println("Couldn't read lines from file.");
+				log.error(e);
 			}
 		}
 		return stringBuffer.toString();

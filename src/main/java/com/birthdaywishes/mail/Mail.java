@@ -8,6 +8,8 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 
+import org.apache.log4j.Logger;
+
 import com.birthdaywishes.constants.Constants;
 import com.birthdaywishes.util.GmailAuthenticator;
 import com.birthdaywishes.util.Utility;
@@ -18,6 +20,7 @@ import com.birthdaywishes.util.Utility;
  *
  */
 public class Mail {
+	private final Logger log=Logger.getLogger(Mail.class); 
 	/**
 	 * @param toEmailList
 	 * This method sends mail to all list of recipients emailIds.
@@ -43,11 +46,7 @@ public class Mail {
 			Transport.send(message);
 			System.out.println("Sent mail successfully....");
 		} catch (MessagingException e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
+			log.error(e);
 		}
 	}
 }

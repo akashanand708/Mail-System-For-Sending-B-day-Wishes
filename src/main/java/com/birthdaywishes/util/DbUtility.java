@@ -10,6 +10,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.birthdaywishes.constants.Constants;
 
 /**
@@ -18,6 +20,7 @@ import com.birthdaywishes.constants.Constants;
  */
 public class DbUtility implements DbUtilityInterface{
 
+	private final static Logger log=Logger.getLogger(DbUtility.class);
 	/* (non-Javadoc)
 	 * @see com.vishalstationers.util.DbUtilityInterface#getListOfToEmailAddress()
 	 */
@@ -55,11 +58,9 @@ public class DbUtility implements DbUtilityInterface{
 					"sample_project");
 
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
+			log.error(e);			
+		} catch (SQLException e) {
+			log.error(e);
 		}
 		return con;
 	}
@@ -84,15 +85,13 @@ public class DbUtility implements DbUtilityInterface{
 				}
 			}
 		} catch (SQLException Ex) {
-			Ex.printStackTrace();
-			System.out.println(Ex.getMessage());
+			log.error(Ex);			
 		} finally {
 			try {
 				stmt.close();
 				con.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
-				System.out.println(e.getMessage());
+				log.error(e);				
 			}
 
 		}

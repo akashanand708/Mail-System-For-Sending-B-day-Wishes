@@ -10,6 +10,7 @@ public class Main {
 	   
 	   //Get listOfToEmailAddress.
 	   DbUtility dbUtility=new DbUtility();
+	   System.out.println("Fetching Records....");
 	   List<String> listOfToEmailAddress=dbUtility.getListOfToEmailAddress();
 	   
 	   //Send B'day Mail to all listOfToEmailAddress.
