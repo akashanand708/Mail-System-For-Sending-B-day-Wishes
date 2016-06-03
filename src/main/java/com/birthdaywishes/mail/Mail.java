@@ -3,14 +3,10 @@ package com.birthdaywishes.mail;
 import java.util.List;
 import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.Transport;
-
-import org.apache.log4j.Logger;
 
 import com.birthdaywishes.constants.Constants;
+import com.birthdaywishes.dto.User;
 import com.birthdaywishes.util.GmailAuthenticator;
 import com.birthdaywishes.util.Utility;
 
@@ -19,13 +15,12 @@ import com.birthdaywishes.util.Utility;
  * This class does send mail activity.
  *
  */
-public class Mail {
-	private final Logger log=Logger.getLogger(Mail.class); 
+public class Mail {	
 	/**
 	 * @param toEmailList
 	 * This method sends mail to all list of recipients emailIds.
 	 */
-	public void sendMail(List<String> toEmailList) {
+	public void sendMail(List<User> toEmailList) {
 		String subject = Constants.HAPPY_BIRTHDAY;
 		String text = Constants.HAPPY_BIRTHDAY_TEXT;
 		final String username = "test007110390@gmail.com";
@@ -39,14 +34,7 @@ public class Mail {
 		Session session = Session.getDefaultInstance(props, new GmailAuthenticator(username, password));
 
 		// 3.Create message.
-		Message message = utility.createMimeMessage(session, toEmailList, subject, text);
+		utility.createMimeMessageAndSend(session, toEmailList, subject, text);
 
-		// 4.Send mail.
-		try {
-			Transport.send(message);
-			System.out.println("Sent mail successfully....");
-		} catch (MessagingException e) {
-			log.error(e);
-		}
 	}
 }

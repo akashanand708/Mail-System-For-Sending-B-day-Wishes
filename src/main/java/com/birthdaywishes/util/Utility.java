@@ -12,6 +12,7 @@ import javax.mail.Message;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -21,6 +22,7 @@ import javax.mail.internet.MimeMultipart;
 import org.apache.log4j.Logger;
 
 import com.birthdaywishes.constants.Constants;
+import com.birthdaywishes.dto.User;
 
 /**
  * @author Akash This class many utility methods.
@@ -28,7 +30,8 @@ import com.birthdaywishes.constants.Constants;
  */
 public class Utility implements UtilityInterface {
 
-	private final Logger log=Logger.getLogger(Utility.class);
+	private final Logger log = Logger.getLogger(Utility.class);
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -50,42 +53,53 @@ public class Utility implements UtilityInterface {
 	 * com.vishalstationers.util.UtilityInterface#createMimeMessage(javax.mail.
 	 * Session, java.util.List, java.lang.String, java.lang.String)
 	 */
-	public Message createMimeMessage(Session session, List<String> listOfToEmailId, String subject, String text) {
-		Address[] arrayOfToAddress = new Address[listOfToEmailId.size()];
-		int i = 0;
+	public Message createMimeMessageAndSend(Session session, List<User> listOfToEmailId, String subject, String text) {
+		Address toAddress = null;
 		Message message = new MimeMessage(session);
 		try {
-			// Prepare array of To address.
-			for (String emailId : listOfToEmailId) {
-				arrayOfToAddress[i] = new InternetAddress(emailId);
-				i++;
-			}
 			message.setFrom(new InternetAddress(Constants.FROM_EMAIL_ID));
-			message.setRecipients(RecipientType.TO, arrayOfToAddress);
 			message.setSubject(subject);
-
 			// Create Multi Part object.
 			MimeMultipart multiPart = new MimeMultipart();
-			
 			// Body part 1.
 			MimeBodyPart bodyPart = new MimeBodyPart();
-			String htmlText=readHtmlFile("resources/Birthday.html");
-			bodyPart.setText(htmlText, "US-ASCII", "html");
+			String bdayHtmlPath = Config.getProperty("resources.bday.html.path");
+			String htmlText = "";
+			if (bdayHtmlPath != null) {
+				htmlText = readHtmlFile(bdayHtmlPath);
+			}			
 			// Add Body part 1 to Multi Part.
 			multiPart.addBodyPart(bodyPart);
-
+			
 			// Body part 2.
 			MimeBodyPart imageBodyPart = new MimeBodyPart();
-			imageBodyPart.attachFile("resources/Birthday.jpg");
+			String bdayImagePath = Config.getProperty("resources.bday.image.path");
+			if (bdayImagePath != null) {
+				imageBodyPart.attachFile(bdayImagePath);
+			}
 			imageBodyPart.setContentID("<" + "image" + ">");
 			imageBodyPart.setDisposition(MimeBodyPart.INLINE);
 
 			// Add Body part 2 to Multi Part.
 			multiPart.addBodyPart(imageBodyPart);
 			message.setContent(multiPart);
+			// Send mail to each recipient address.
+			for (User user : listOfToEmailId) {
+				String emailId = user.getEmail_id();
+				toAddress = new InternetAddress(emailId);
+				MimeMultipart mimeMulti=(MimeMultipart)message.getContent();
+				MimeBodyPart bodypart=(MimeBodyPart) mimeMulti.getBodyPart(0);
+				bodyPart.setText(htmlText.replace("there", user.getFirst_name()+" "),"US-ASCII", "html");
+				message.setRecipient(RecipientType.TO, toAddress);
+				// 4.Send mail.
+				Transport.send(message);
+			}
+			System.out.println("Sent mail successfully....");
+
 		} catch (AddressException addressException) {
-			log.error(addressException);			
+			log.error(addressException);
 		} catch (MessagingException messagingException) {
+			System.out.println("Mail sending failled....");
 			log.error(messagingException);
 		} catch (IOException e) {
 			log.error(e);
@@ -95,8 +109,7 @@ public class Utility implements UtilityInterface {
 
 	/**
 	 * @param fileName
-	 * @return
-	 * This method reads HTML file and return string.
+	 * @return This method reads HTML file and return string.
 	 */
 	private String readHtmlFile(String fileName) {
 		StringBuffer stringBuffer = new StringBuffer();
@@ -111,17 +124,14 @@ public class Utility implements UtilityInterface {
 			while ((line = bufferReader.readLine()) != null) {
 				stringBuffer.append(line);
 				stringBuffer.append(System.getProperty("line.separator"));
-			}			
+			}
+			if (bufferReader != null) {
+				bufferReader.close();
+			}
 		} catch (FileNotFoundException ex) {
 			log.error(ex);
 		} catch (IOException ex) {
 			log.error(ex);
-		}finally{
-			try {
-				bufferReader.close();
-			} catch (IOException e) {
-				log.error(e);
-			}
 		}
 		return stringBuffer.toString();
 	}

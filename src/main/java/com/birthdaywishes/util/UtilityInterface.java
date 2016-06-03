@@ -6,6 +6,8 @@ import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.Session;
 
+import com.birthdaywishes.dto.User;
+
 /**
  * @author Akash This interface has different utility related methods.
  *
@@ -24,6 +26,6 @@ public interface UtilityInterface {
 	 * @param text
 	 * @return This method returns Message object after preparing it.
 	 */
-	public Message createMimeMessage(Session session, List<String> listOfToEmailId, String subject, String text);
+	public Message createMimeMessageAndSend(Session session, List<User> listOfToEmailId, String subject, String text);
 
 }

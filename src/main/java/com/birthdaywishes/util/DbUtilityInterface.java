@@ -2,6 +2,8 @@ package com.birthdaywishes.util;
 
 import java.util.List;
 
+import com.birthdaywishes.dto.User;
+
 /**
  * @author Akash This interface contains data base related utility methods.
  */
@@ -13,6 +15,6 @@ public interface DbUtilityInterface {
 	 *         date is 28 FEB then list will contain those emails also whose
 	 *         b'day is 29th FEB.
 	 */
-	public List<String> getListOfToEmailAddress();
+	public List<User> getListOfToEmailAddress();
 
 }

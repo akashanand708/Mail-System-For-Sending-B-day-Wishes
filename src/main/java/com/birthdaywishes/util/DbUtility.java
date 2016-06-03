@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.birthdaywishes.constants.Constants;
+import com.birthdaywishes.dto.User;
 
 /**
  * @author Akash This interface contains data base related utility methods.
@@ -24,8 +25,8 @@ public class DbUtility implements DbUtilityInterface{
 	/* (non-Javadoc)
 	 * @see com.vishalstationers.util.DbUtilityInterface#getListOfToEmailAddress()
 	 */
-	public List<String> getListOfToEmailAddress(){
-		List<String> listOfToEmailAddress=new ArrayList<String>();
+	public List<User> getListOfToEmailAddress(){
+		List<User> listOfToEmailAddress=new ArrayList<User>();
 		Connection con = getConnection();
 		GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
 		int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -70,8 +71,8 @@ public class DbUtility implements DbUtilityInterface{
 	 * @return This method execute query and return result,(i.e)list of To email
 	 *         Ids.
 	 */
-	private List<String> execute(Connection con, String selectQuery) {
-		List<String> listOfToEmailAddress=new ArrayList<String>();
+	private List<User> execute(Connection con, String selectQuery) {
+		List<User> listOfToEmailAddress=new ArrayList<User>();
 		PreparedStatement stmt = null;
 		try {
 			stmt = con.prepareStatement(selectQuery, ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
@@ -80,8 +81,11 @@ public class DbUtility implements DbUtilityInterface{
 				System.out.println("No record found");
 			} else {
 				resultSet.beforeFirst();
-				while (resultSet.next() != false) {					
-					listOfToEmailAddress.add(resultSet.getString("EMAIL_ID"));
+				while (resultSet.next() != false) {	
+					User user=new User();
+					user.setEmail_id(resultSet.getString("EMAIL_ID"));
+					user.setFirst_name(resultSet.getString("FIRST_NAME"));
+					listOfToEmailAddress.add(user);
 				}
 			}
 		} catch (SQLException Ex) {
